@@ -1,0 +1,24 @@
+Evaluate my SQL technical interview practice answers. Grade each query for correctness, explain errors, and provide corrected SQL. Here are my answers:
+1. Display each employee's name, department name, and salary.
+SELECT E.EmpName,D.DeptName,SUM(S. SalaryAmount) AS TotalSalary FROM SalaryHistory S INNER JOIN Employee E ON E.EmpID = S.EmpID INNER JOIN  Department D ON D.DeptID = E.DeptID GROUP BY E.EmpName,D.DeptName;
+
+2. Find employees earning more than the average salary of their department.
+ WITH SALCOMP AS (select E.EmpName,D.DeptName,S.SalaryAmount AS  Salary,AVG(S.SalaryAmount) OVER(PARTITION BY D.DeptName) AS DEPTAVGSALARY  FROM SalaryHistory S INNER JOIN Employee E ON E.EmpID = S.EmpID INNER JOIN  Department D ON D.DeptID = E.DeptID) SELECT  EmpName,DeptName,SUM(Salary),DEPTAVGSALARY FROM SALCOMP GROUP BY EmpName,DeptName,DEPTAVGSALARY HAVING SUM(Salary) > DEPTAVGSALARY;
+
+3. Calculate the total salary paid to each employee using SalaryHistory.
+SELECT E.EmpName,SUM(S.SalaryAmount) AS TotalSalary FROM SalaryHistory S INNER JOIN Employee E ON E.EmpID = S.EmpID GROUP BY E.EmpName;
+
+4. Find employees whose total salary history amount is greater than 70,000.
+SELECT E.EmpName,SUM(S.SalaryAmount) AS TotalSalary FROM SalaryHistory S INNER JOIN Employee E ON E.EmpID = S.EmpID GROUP BY E.EmpName HAVING SUM(S.SalaryAmount) > 70000;
+
+5. Display each department's total employee salary and average employee salary.
+ELECT SUM(E. Salary) AS TOTALDEPTSALARY,AVG(E. Salary) AS Avgdeptsalary,D.DeptName FROM SalaryHistory S INNER JOIN Employee E ON E.EmpID = S.EmpID INNER JOIN  Department D ON D.DeptID = E.DeptID GROUP BY D.DeptName;
+
+6. Find the second-highest salary among employees.
+WITH SALARYRANKING AS (SELECT EmpName,Salary,DENSE_RANK() OVER(ORDER BY Salary DESC) AS RANKING FROM Employee) SELECT Salary FROM  SALARYRANKING WHERE RANKING = 2;
+
+7. Find employees who have more than one salary-history record.
+SELECT  EmpID,COUNT(HistoryID) FROM  SalaryHistory GROUP BY EmpID HAVING COUNT(HistoryID) > 1;
+
+8. Show each employee's salary alongside the average salary of their department, without removing employee rows.
+SELECT  EmpName, Salary,AVG( Salary) OVER(PARTITION  BY DeptID) FROM Employee;
